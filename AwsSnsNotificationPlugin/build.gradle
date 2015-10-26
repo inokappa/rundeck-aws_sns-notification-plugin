@@ -1,0 +1,45 @@
+version = '0.0.1'
+defaultTasks 'clean','build'
+apply plugin: 'java'
+apply plugin: 'idea'
+sourceCompatibility = 1.5
+ext.rundeckPluginVersion= '1.1'
+
+configurations{
+    pluginLibs
+    compile{
+        extendsFrom pluginLibs
+    }
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencies {
+  compile(group:'org.rundeck', name: 'rundeck-core', version: '2.6.1')
+  pluginLibs group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.10.28'
+}
+
+task copyToLib(type: Copy) {
+  into "$buildDir/output/lib"
+  from configurations.pluginLibs
+}
+
+jar {
+  //include contents of output dir
+  from "$buildDir/output"
+  manifest {
+    attributes 'Rundeck-Plugin-Version': rundeckPluginVersion, 'Rundeck-Plugin-Archive': 'true', 'Rundeck-Plugin-Libs-Load-First':'false'
+    //create space-separated list of pluginLibs
+    def libList = configurations.pluginLibs.collect{'lib/'+it.name}.join(' ')
+    attributes 'Rundeck-Plugin-Classnames': 'com.inokara.rundeck.plugin.AwsSnsNotificationPlugin', 'Rundeck-Plugin-Libs': "${libList}"
+  }
+}
+
+jar.dependsOn(copyToLib)
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.8'
+}
