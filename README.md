@@ -19,7 +19,7 @@ Copy the jar file to the plugins directory:
 
 ### Configure
 
-![]()
+![](https://raw.githubusercontent.com/inokappa/rundeck-aws_sns-notification-plugin/master/doc/images/2015102602.png)
 
 - AWS Access Key
 - AWS Secret Key
